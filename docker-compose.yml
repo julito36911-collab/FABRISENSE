@@ -10,6 +10,7 @@ services:
       - mongo_data:/data/db
     environment:
       MONGO_INITDB_DATABASE: fabrisense
+    restart: unless-stopped
 
   mqtt:
     image: eclipse-mosquitto:2
@@ -23,7 +24,18 @@ services:
       - mqtt_logs:/mosquitto/log
     restart: unless-stopped
 
+  redis:
+    image: redis:7-alpine
+    container_name: fabrisense-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
 volumes:
   mongo_data:
   mqtt_data:
   mqtt_logs:
+  redis_data:
