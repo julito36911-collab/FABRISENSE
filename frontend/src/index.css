@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* RTL support for Hebrew */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .flex {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] header,
+[dir="rtl"] nav {
+  direction: rtl;
+}
+
+* {
+  box-sizing: border-box;
+}

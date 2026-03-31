@@ -1,0 +1,12 @@
+{
+  "app_name": "FabriSense",
+  "welcome": "ברוכים הבאים ל-FabriSense",
+  "dashboard": "לוח בקרה",
+  "machines": "מכונות",
+  "orders": "הזמנות",
+  "alerts": "התראות",
+  "settings": "הגדרות",
+  "language": "שפה",
+  "login": "התחברות",
+  "logout": "התנתקות"
+}

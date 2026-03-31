@@ -1,0 +1,17 @@
+{
+  "app_name": "FabriSense",
+  "welcome": "Bienvenido a FabriSense",
+  "dashboard": "Panel Principal",
+  "machines": "Máquinas",
+  "orders": "Órdenes",
+  "alerts": "Alertas",
+  "settings": "Configuración",
+  "language": "Idioma",
+  "login": "Iniciar Sesión",
+  "logout": "Cerrar Sesión",
+  "errors": {
+    "not_found": "Recurso no encontrado",
+    "unauthorized": "No autorizado",
+    "server_error": "Error interno del servidor"
+  }
+}

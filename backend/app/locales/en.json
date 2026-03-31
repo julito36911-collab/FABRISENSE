@@ -1,0 +1,17 @@
+{
+  "app_name": "FabriSense",
+  "welcome": "Welcome to FabriSense",
+  "dashboard": "Dashboard",
+  "machines": "Machines",
+  "orders": "Orders",
+  "alerts": "Alerts",
+  "settings": "Settings",
+  "language": "Language",
+  "login": "Login",
+  "logout": "Logout",
+  "errors": {
+    "not_found": "Resource not found",
+    "unauthorized": "Unauthorized",
+    "server_error": "Internal server error"
+  }
+}

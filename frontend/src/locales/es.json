@@ -1,0 +1,12 @@
+{
+  "app_name": "FabriSense",
+  "welcome": "Bienvenido a FabriSense",
+  "dashboard": "Panel Principal",
+  "machines": "Máquinas",
+  "orders": "Órdenes",
+  "alerts": "Alertas",
+  "settings": "Configuración",
+  "language": "Idioma",
+  "login": "Iniciar Sesión",
+  "logout": "Cerrar Sesión"
+}
