@@ -11,5 +11,19 @@ services:
     environment:
       MONGO_INITDB_DATABASE: fabrisense
 
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: fabrisense-mqtt
+    ports:
+      - "1883:1883"
+      # - "8883:8883"  # TLS - habilitar en producción
+    volumes:
+      - ./mqtt/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mqtt_data:/mosquitto/data
+      - mqtt_logs:/mosquitto/log
+    restart: unless-stopped
+
 volumes:
   mongo_data:
+  mqtt_data:
+  mqtt_logs:
