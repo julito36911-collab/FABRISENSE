@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routers import tenants
 from app.routers import auth
+from app.routers import connectors
+from app.routers import asistencia
 
 app = FastAPI(
     title="FabriSense API",
@@ -21,6 +23,8 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(tenants.router)
+app.include_router(connectors.router)
+app.include_router(asistencia.router)
 
 
 @app.get("/health")
