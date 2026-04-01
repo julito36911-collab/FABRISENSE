@@ -6,6 +6,7 @@ from app.routers import auth
 from app.routers import connectors
 from app.routers import asistencia
 from app.routers import inteligencia
+from app.routers import aps
 
 app = FastAPI(
     title="FabriSense API",
@@ -27,6 +28,7 @@ app.include_router(tenants.router)
 app.include_router(connectors.router)
 app.include_router(asistencia.router)
 app.include_router(inteligencia.router)
+app.include_router(aps.router)
 
 
 @app.get("/health")
