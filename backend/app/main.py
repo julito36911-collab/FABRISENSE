@@ -1,17 +1,33 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.config import settings
+from app.database import conectar_mongo, desconectar_mongo
 from app.routers import tenants
 from app.routers import auth
 from app.routers import connectors
 from app.routers import asistencia
 from app.routers import inteligencia
 from app.routers import aps
+from app.routers import dashboard
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: conectar MongoDB
+    await conectar_mongo()
+    yield
+    # Shutdown: cerrar conexion
+    await desconectar_mongo()
+
 
 app = FastAPI(
     title="FabriSense API",
-    version="0.1.0",
+    version="0.2.0",
     description="Sistema de Inteligencia Operacional para fábricas metalmecánicas",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -29,8 +45,9 @@ app.include_router(connectors.router)
 app.include_router(asistencia.router)
 app.include_router(inteligencia.router)
 app.include_router(aps.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "fabrisense-api", "version": "0.1.0"}
+    return {"status": "ok", "service": "fabrisense-api", "version": "0.2.0"}
