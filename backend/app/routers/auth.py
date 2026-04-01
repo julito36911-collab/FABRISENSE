@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError
 
+from app.database import get_database
 from app.models.user import LoginRequest, TokenResponse, User, UserCreate, UserInDB
 from app.services.auth import (
     create_access_token,
@@ -14,17 +15,12 @@ from app.services.auth import (
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 bearer_scheme = HTTPBearer()
 
-# In-memory user store for development (replaced by MongoDB later)
-_users: dict[str, UserInDB] = {}
-_users_by_email: dict[str, str] = {}  # email → user_id
-
 
 def _get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
 ) -> dict:
     try:
-        payload = verify_access_token(credentials.credentials)
-        return payload
+        return verify_access_token(credentials.credentials)
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -34,20 +30,34 @@ def _get_current_user(
 
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
-def register(
+async def register(
     body: UserCreate,
     current: dict = Depends(_get_current_user),
+    db=Depends(get_database),
 ):
     if current.get("rol") != "admin":
         raise HTTPException(status_code=403, detail="Solo los administradores pueden registrar usuarios")
 
-    if body.email in _users_by_email:
+    existing = await db["users"].find_one({"email": body.email})
+    if existing:
         raise HTTPException(status_code=409, detail="El email ya está registrado")
 
     user_id = str(uuid.uuid4())
     tenant_id = current.get("tenant_id", "default")
 
-    user = UserInDB(
+    doc = {
+        "user_id":         user_id,
+        "tenant_id":       tenant_id,
+        "email":           body.email,
+        "nombre":          body.nombre,
+        "rol":             body.rol,
+        "idioma":          body.idioma,
+        "activo":          True,
+        "hashed_password": hash_password(body.password),
+    }
+    await db["users"].insert_one(doc)
+
+    return User(
         user_id=user_id,
         tenant_id=tenant_id,
         email=body.email,
@@ -55,37 +65,40 @@ def register(
         rol=body.rol,
         idioma=body.idioma,
         activo=True,
-        hashed_password=hash_password(body.password),
     )
-    _users[user_id] = user
-    _users_by_email[body.email] = user_id
-
-    return User(**user.model_dump(exclude={"hashed_password"}))
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(body: LoginRequest):
-    user_id = _users_by_email.get(body.email)
-    if not user_id:
+async def login(body: LoginRequest, db=Depends(get_database)):
+    doc = await db["users"].find_one({"email": body.email})
+    if not doc:
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
-    user = _users[user_id]
-    if not user.activo:
+    if not doc.get("activo", True):
         raise HTTPException(status_code=403, detail="Usuario inactivo")
-    if not verify_password(body.password, user.hashed_password):
+
+    if not verify_password(body.password, doc["hashed_password"]):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
     token = create_access_token(
-        user_id=user.user_id,
-        tenant_id=user.tenant_id,
-        rol=user.rol,
+        user_id=doc["user_id"],
+        tenant_id=doc["tenant_id"],
+        rol=doc["rol"],
     )
     return TokenResponse(access_token=token)
 
 
 @router.get("/me", response_model=User)
-def me(current: dict = Depends(_get_current_user)):
-    user = _users.get(current["sub"])
-    if not user:
+async def me(current: dict = Depends(_get_current_user), db=Depends(get_database)):
+    doc = await db["users"].find_one({"user_id": current["sub"]})
+    if not doc:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    return User(**user.model_dump(exclude={"hashed_password"}))
+    return User(
+        user_id=doc["user_id"],
+        tenant_id=doc["tenant_id"],
+        email=doc["email"],
+        nombre=doc["nombre"],
+        rol=doc["rol"],
+        idioma=doc.get("idioma", "es"),
+        activo=doc.get("activo", True),
+    )

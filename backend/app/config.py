@@ -1,4 +1,8 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings
+
+# .env siempre relativo a este archivo: backend/app/config.py → backend/.env
+_ENV_FILE = Path(__file__).parent.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -10,7 +14,8 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379"
 
     class Config:
-        env_file = ".env"
+        env_file = str(_ENV_FILE)
+        extra = "ignore"
 
 
 settings = Settings()

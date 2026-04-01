@@ -17,7 +17,7 @@ Factor de oportunidad:
 """
 
 from datetime import date, datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 
 # ---------------------------------------------------------------------------
@@ -169,8 +169,6 @@ def ranking_oportunidad(
 # ---------------------------------------------------------------------------
 # Consulta async MongoDB
 # ---------------------------------------------------------------------------
-
-from typing import Optional
 
 
 async def calcular_oportunidad_mongo(

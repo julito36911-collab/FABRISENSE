@@ -21,6 +21,10 @@ import sys
 import uuid
 from datetime import date, timedelta
 
+# Fix encoding en Windows (consola cp1252 no soporta caracteres como ñ)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != "utf-8":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 from dotenv import load_dotenv
 
 # Cargar .env antes de importar config
